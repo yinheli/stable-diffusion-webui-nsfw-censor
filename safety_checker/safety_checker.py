@@ -44,7 +44,7 @@ class StableDiffusionSafetyChecker(PreTrainedModel):
         self.special_care_embeds_weights = nn.Parameter(torch.ones(3), requires_grad=False)
 
     @torch.no_grad()
-    def forward(self, clip_input):
+    def forward(self, clip_input, adjustment_init:float=0.0):
         pooled_output = self.vision_model(clip_input)[1]  # pooled_output
         image_embeds = self.visual_projection(pooled_output)
 
@@ -59,7 +59,7 @@ class StableDiffusionSafetyChecker(PreTrainedModel):
 
             # increase this value to create a stronger `nfsw` filter
             # at the cost of increasing the possibility of filtering benign images
-            adjustment = 0.0
+            adjustment = adjustment_init
 
             for concept_idx in range(len(special_cos_dist[0])):
                 concept_cos = special_cos_dist[i][concept_idx]
