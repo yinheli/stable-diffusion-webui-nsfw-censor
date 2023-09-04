@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageFilter
 from transformers import AutoFeatureExtractor
 
 from modules import scripts
@@ -51,15 +51,6 @@ class NsfwCheckScript(scripts.Script):
             if x:
                 image = Image.fromarray((images[i].cpu().permute(1, 2, 0).numpy() * 255).astype(np.uint8))
                 image = image.filter(ImageFilter.GaussianBlur(radius=50))
-                draw = ImageDraw.Draw(image)
-                text = "NSFW content detected"
-                # apt-get install fonts-ubuntu
-                font = ImageFont.truetype("Ubuntu-B.ttf", size=16)
-                _, _, w, h = draw.textbbox(xy=(0,0), text=text, font=font)
-                x = (image.width - w) / 2
-                y = (image.height - h) / 2
-                draw.rectangle((x-4, y-4, x+w+5, y+h+5), fill=(0, 0, 0))
-                draw.text((x, y), text, (255, 255, 255), align="center", font=font)
                 images[i] = torch.from_numpy(np.array(image)/255).permute(2, 0, 1)
 
         p.extra_generation_params.update({"nsfw_check": has_nsfw_concept})
