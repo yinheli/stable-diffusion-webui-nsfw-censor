@@ -1,1 +1,8 @@
 A NSFW checker for [Web UI](https://github.com/AUTOMATIC1111/stable-diffusion-webui). Replaces non-worksafe images with black squares. Install it from UI.
+
+## modification
+
+- preload model on startup.
+- modify `StableDiffusionSafetyChecker`, remove black image replacement.
+- filter non-worksafe images with gaussian blur & tag with `nsfw`.
+- add generate params with `nsfw_check` field.
