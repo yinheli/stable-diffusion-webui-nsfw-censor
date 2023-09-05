@@ -56,7 +56,9 @@ class NsfwCheckScript(scripts.Script):
                 image = image.filter(ImageFilter.GaussianBlur(radius=50))
                 images[i] = torch.from_numpy(np.array(image)/255).permute(2, 0, 1)
 
-        p.extra_generation_params.update({"nsfw_check": has_nsfw_concept})
+        if "nsfw_check" not in p.extra_generation_params:
+            p.extra_generation_params["nsfw_check"] = []
+        p.extra_generation_params["nsfw_check"].extend(has_nsfw_concept)
 
 
 def on_ui_settings():
