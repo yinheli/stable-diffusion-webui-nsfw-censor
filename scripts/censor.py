@@ -2,8 +2,9 @@ import numpy as np
 import torch
 from PIL import Image, ImageFilter
 from transformers import AutoFeatureExtractor
+import gradio as gr
 
-from modules import scripts, shared, script_callbacks
+from modules import scripts, shared
 
 from safety_checker.safety_checker import StableDiffusionSafetyChecker
 
@@ -47,7 +48,7 @@ class NsfwCheckScript(scripts.Script):
     def postprocess_batch(self, p, *args, **kwargs):
         if shared.opts.filter_nsfw is False:
             return
-        
+
         images = kwargs['images']
         has_nsfw_concept = censor_batch(images)[:]
         for i, x in enumerate(has_nsfw_concept):
@@ -61,9 +62,7 @@ class NsfwCheckScript(scripts.Script):
         p.extra_generation_params["nsfw_check"].extend(has_nsfw_concept)
 
 
-def on_ui_settings():
-    import gradio as gr
-    shared.opts.add_option("filter_nsfw", shared.OptionInfo(True, "Filter NSFW", gr.Checkbox, {"interactive": True}, section=("nsfw", "NSFW")))
-    shared.opts.add_option("filter_nsfw_adjustment", shared.OptionInfo(-0.04, "Filter NSFW adjustment", gr.Slider, {"interactive": True, "minimum": -0.5, "maximum": 0.5, "step": 0.01}, section=("nsfw", "NSFW Adjustment")))
-
-script_callbacks.on_ui_settings(on_ui_settings)
+shared.options_templates.update(shared.options_section(('nsfw', "NSFW"), {
+    "filter_nsfw": shared.OptionInfo(True, "Filter NSFW", gr.Checkbox, {"interactive": True}),
+    "filter_nsfw_adjustment": shared.OptionInfo(-0.04, "Filter NSFW adjustment", gr.Slider, {"interactive": True, "minimum": -0.5, "maximum": 0.5, "step": 0.01}),
+}))
